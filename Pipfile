@@ -13,6 +13,7 @@ django-environ = "==0.10.0"
 pytest-django = "==4.5.2"
 pytest-cov = "==4.0.0"
 dj-database-url = "==2.0.0"
+djangorestframework = "==3.14"
 
 [dev-packages]
 

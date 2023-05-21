@@ -43,6 +43,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "users.apps.UsersConfig",
+    # third-party
+    "rest_framework",
+    # local
     "home.apps.HomeConfig",
 ]
 
