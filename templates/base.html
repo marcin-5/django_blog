@@ -1,3 +1,5 @@
+{% load static %}
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -8,9 +10,11 @@
     <title>{% block title %}Welcome{%  endblock %}</title>
 
     {% block styles %}
+        <link rel="stylesheet" href="{%  static 'styles/bootstrap.min.css' %}">
     {% endblock %}
 
     {% block scripts %}
+        <script src="{% static 'scripts/bootstrap.min.js' %}"></script>
     {% endblock %}
 
 </head>
@@ -18,9 +22,24 @@
 
 {% include "partials/navbar.html" %}
 
-{% block content %}
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-8">
+            {% block content %}{% endblock %}
+        </div>
+        <div class="col-4">
+            {% block aside %}{% endblock %}
+        </div>
+    </div>
+</div>
 
-{% endblock %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            {% block footer %}{% endblock %}
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
