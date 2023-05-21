@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os.path
 from pathlib import Path
 
+import dj_database_url
 import environ
 
 env = environ.Env()
@@ -87,6 +88,16 @@ DATABASES = {
         "PASSWORD": env("POSTGRES_DB_PASS"),
     }
 }
+
+POSTGRES_DB_URL = env("POSTGRES_CONNECTION_STRING")
+
+DATABASES["default"].update(
+    dj_database_url.config(
+        default=POSTGRES_DB_URL,
+        conn_max_age=500,
+        ssl_require=False if env("SSL_REQUIRE") == "0" else True,
+    )
+)
 
 
 # Password validation
