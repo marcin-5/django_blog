@@ -1,0 +1,21 @@
+services:
+  postgresdb:
+    image: postgres:15-alpine
+    volumes:
+      - postgres:/var/lib/postgres/data
+    env_file:
+      - ../../config/.env
+    ports:
+      - 5445:5432
+
+  mongodb:
+    image: mongo
+    volumes:
+      - mongodb:/data/db
+    env_file:
+      - ../../config/.env
+    ports:
+      - 27017:27017
+volumes:
+  postgres:
+  mongodb:

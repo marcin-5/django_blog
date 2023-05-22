@@ -89,7 +89,29 @@ DATABASES = {
         "NAME": env("POSTGRES_DB"),
         "USER": env("POSTGRES_USER"),
         "PASSWORD": env("POSTGRES_PASSWORD"),
-    }
+    },
+    "articles": {
+        "ENGINE": "djongo",
+        "NAME": env("MONGO_INITDB_DATABASE"),
+        "ENFORCE_SCHEMA": False,
+        "CLIENT": {
+            "host": env("MONGO_HOST"),
+            "port": env("MONGO_PORT"),
+            "username": env("MONGO_INITDB_ROOT_USERNAME"),
+            "password": env("MONGO_INITDB_ROOT_PASSWORD"),
+            "authSource": env("MONGO_AUTH_SOURCE_DATABASE"),
+            "authMechanism": "SCRAM-SHA-1",
+        },
+        "LOGGING": {
+            "version": 1,
+            "loggers": {
+                "djongo": {
+                    "level": "DEBUG",
+                    "propagate": False,
+                }
+            },
+        },
+    },
 }
 
 POSTGRES_DB_URL = env("POSTGRES_CONNECTION_STRING")
