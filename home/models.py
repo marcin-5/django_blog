@@ -1,6 +1,7 @@
 import re
 
 from django.db import models
+from django.core.exceptions import ValidationError
 from django.utils.text import slugify
 
 from users.models import CustomUser
@@ -44,7 +45,12 @@ class Article(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title)
+            pl_chars = dict(zip(('ą', 'ć', 'ę', 'ł', 'ń', 'ó', 'ś', 'ż', 'ź'),
+                                ('a', 'c', 'e', 'l', 'n', 'o', 's', 'z', 'z')))
+            title = ''.join([pl_chars[_] if _ in pl_chars else _ for _ in self.title.split('.')[0] or self.title])
+            if not (slug := slugify(title)):
+                raise ValidationError("Slug created from title is empty.")
+            self.slug = slug
         return super().save(*args, **kwargs)
 
     def __str__(self):
