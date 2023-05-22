@@ -3,6 +3,8 @@ import re
 from django.db import models
 from django.utils.text import slugify
 
+from users.models import CustomUser
+
 
 class Tag(models.Model):
     name = models.CharField(max_length=32, unique=True)
@@ -30,9 +32,10 @@ class Category(models.Model):
 
 class Article(models.Model):
     title = models.CharField(max_length=200)
-    slug = models.SlugField(blank=True, unique=True)
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(blank=True, unique=True)
     tags = models.ManyToManyField(Tag, blank=True)
     categories = models.ManyToManyField(Category, blank=True)
 
