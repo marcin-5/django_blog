@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "users.apps.UsersConfig",
     # third-party
+    "djongo",
     "rest_framework",
     # local
     "home.apps.HomeConfig",

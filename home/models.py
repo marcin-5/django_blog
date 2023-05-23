@@ -1,8 +1,11 @@
 import re
 
+from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.html import format_html
 from django.utils.text import slugify
+from djongo import models as djongo_models
 
 from users.models import CustomUser
 
@@ -31,14 +34,10 @@ class Category(models.Model):
         return self.name
 
 
-class Article(models.Model):
-    title = models.CharField(max_length=200)
-    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
-    slug = models.SlugField(blank=True, unique=True)
-    tags = models.ManyToManyField(Tag, blank=True)
-    categories = models.ManyToManyField(Category, blank=True)
+class Content(djongo_models.Model):
+    slug = djongo_models.SlugField(blank=True, unique=True, primary_key=True)
+    title = djongo_models.CharField(max_length=200)
+    text = djongo_models.TextField()
 
     class Meta:
         ordering = ["title"]
@@ -54,7 +53,7 @@ class Article(models.Model):
             title = "".join(
                 [
                     pl_chars[_] if _ in pl_chars else _
-                    for _ in self.title.split(".")[0] or self.title
+                    for _ in self.title.split(".")[0].lower() or self.title.lower()
                 ]
             )
             if not (slug := slugify(title)):
@@ -64,3 +63,15 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Article(models.Model):
+    slug = models.OneToOneField(Content, on_delete=models.CASCADE, primary_key=True)
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    tags = models.ManyToManyField(Tag, blank=True)
+    categories = models.ManyToManyField(Category, blank=True)
+
+    def __str__(self):
+        return str(self.slug)
