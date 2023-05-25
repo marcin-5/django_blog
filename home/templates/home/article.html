@@ -3,5 +3,5 @@
 {% block title %}{{ content.title }}{% endblock %}
 
 {% block  content %}
-    <div>{{ content.text }}</div>
+    <div>{{ content.text|safe }}</div>
 {% endblock %}

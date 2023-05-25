@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "users.apps.UsersConfig",
     # third-party
     "djongo",
+    "markdown",
     "rest_framework",
     # local
     "home.apps.HomeConfig",

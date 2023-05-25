@@ -1,3 +1,4 @@
+import markdown
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView, DetailView
 
@@ -20,4 +21,5 @@ class ArticleView(DetailView):
 
     def get_queryset(self):
         self.content = get_object_or_404(Content, slug=self.kwargs["slug"])
+        self.content.text = markdown.markdown(self.content.text)
         return Article.objects.filter(slug=self.content, is_active=True)
