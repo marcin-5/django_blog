@@ -35,9 +35,10 @@ class Category(models.Model):
 
 
 class Content(djongo_models.Model):
-    slug = djongo_models.SlugField(blank=True, unique=True, primary_key=True)
+    slug = djongo_models.SlugField(max_length=50, blank=True, unique=True, primary_key=True)
     title = djongo_models.CharField(max_length=200)
     text = djongo_models.TextField()
+    published = djongo_models.BooleanField(default=False)
 
     class Meta:
         ordering = ["title"]
@@ -62,16 +63,25 @@ class Content(djongo_models.Model):
         return super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.title
+        return self.slug
 
 
 class Article(models.Model):
-    slug = models.OneToOneField(Content, on_delete=models.CASCADE, primary_key=True)
+    slug = models.OneToOneField(Content, max_length=50, on_delete=models.CASCADE, primary_key=True)
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    created = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+    published = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     tags = models.ManyToManyField(Tag, blank=True)
     categories = models.ManyToManyField(Category, blank=True)
+
+    def save(self, *args, **kwargs):
+        res = super().save(*args, **kwargs)
+        if res is None:
+            content = Content.objects.get(slug=self.slug)
+            content.published = True
+            content.save()
+        return res
 
     def __str__(self):
         return str(self.slug)
