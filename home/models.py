@@ -1,9 +1,7 @@
 import re
 
-from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.html import format_html
 from django.utils.text import slugify
 from djongo import models as djongo_models
 
