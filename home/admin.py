@@ -7,7 +7,12 @@ from .models import Tag, Category, Article, Content
 class ArticleAdmin(admin.ModelAdmin):
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "slug":
-            kwargs["queryset"] = Content.objects.filter(published=False)
+            change = request.path.endswith("/change/")
+            kw = {"published": change}
+            if change:
+                kw["slug"] = request.path.split("/")[-3]
+                self.readonly_fields = ("slug", )
+            kwargs["queryset"] = Content.objects.filter(**kw)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
