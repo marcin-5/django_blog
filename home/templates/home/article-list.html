@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}List of articles{% endblock %}
+
+{% block  content %}
+    {% load filters %}
+    <div>
+    {% for slug, title, author_id in article_list %}
+        <a href="/{{ slug }}/">{{ title }}</a>&nbsp;({{ authors|get_item:author_id }})<br>
+    {% endfor %}
+    </div>{% load filters %}
+{% endblock %}
