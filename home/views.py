@@ -41,4 +41,3 @@ class ArticleListView(ListView):
         if "author" in self.kwargs:
             articles = articles.filter(author=self.kwargs["author"])
         return articles.values_list("slug", "slug__title", "author_id")
-git status
