@@ -1,12 +1,53 @@
 {% extends "base.html" %}
 
+{% load static %}
+{% load filters %}
+
 {% block title %}List of articles{% endblock %}
 
 {% block  content %}
-    {% load filters %}
-    <div>
-    {% for slug, title, author_id in article_list %}
-        <a href="/{{ slug }}/">{{ title }}</a>&nbsp;({{ authors|get_item:author_id }})<br>
-    {% endfor %}
-    </div>{% load filters %}
+
+    <form class="form-horizontal px-3 py-2" method="post" action="#" id="form-list" style="background-color: #f5f5f5">
+        {% csrf_token %}
+        <label class="control-label" for="form-filter">Filter by:</label>
+        <div class="form-group" id="form-filter">
+            <label class="m-2 control-label" for="select-author">Author</label>
+            <select class="form-horizontal m-2" id="select-author" name="author_id">
+                <option value="">All</option>
+                {% for id, author in authors.items %}
+                    <option value="{{ id }}"{% if id == author_id %} selected{% endif %}>{{ author }}</option>
+                {% endfor %}
+            </select>
+            <label class="m-2 control-label" for="date-from">Date from</label>
+            <input type="date" id="date-from" name="date_from" value="{{ date_from }}">
+            <label class="m-2 control-label" for="date-to">Date to</label>
+            <input type="date" id="date-to" name="date_to" value="{{ date_to }}">
+        </div>
+        <label class="control-label" for="form-order">Order by:</label>
+        <div class="form-group" id="form-order">
+            <label class="m-2 control-label" for="select-order">Field name</label>
+            <select class="form-horizontal m-2" id="select-order" name="order_by">
+                {% for key in order_fields.keys %}
+                    <option value="{{ key }}"{% if order_by == key %} selected{% endif %}>{{ key }}</option>
+                {% endfor %}
+            </select>
+            <label class="m-2 control-label" for="asc">ASC</label>
+            <input type="radio" name="direction" value="asc" id="asc"{% if direction == "asc" %} checked{% endif %}>
+            <label class="m-2 control-label" for="desc">DESC</label>
+            <input type="radio" name="direction" value="desc" id="desc"{% if direction == "desc" %} checked{% endif %}>
+            <button type="submit" class="button px-2 mx-3">Show</button>
+        </div>
+    </form>
+
+    <div class="list-group">
+        {% for slug, title, author_id in article_list %}
+            <a class="list-group-item border-0" href="/{{ slug }}/">
+                <img class="mx-lg-3" src="{% static 'images/link_black_24dp.svg' %}" alt="Go to article">
+                {{ title }}
+                <button class="badge bg-secondary mx-lg-3" form="form-filter" name="author_id"
+                        value="{{ author_id }}">{{ authors|get_item:author_id }}</button>
+            </a>
+        {% endfor %}
+    </div>
+
 {% endblock %}
