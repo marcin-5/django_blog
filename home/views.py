@@ -1,8 +1,11 @@
+import re
+
 import markdown
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render, redirect
+from django.views import View
 from django.views.generic import TemplateView, DetailView, ListView
 
-from home.models import Article, Content
+from home.models import Article, Content, Tag, Category
 
 
 class HomeView(TemplateView):
@@ -61,3 +64,43 @@ class ArticleListView(ListView):
 
     def post(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
+
+
+class ArticleAddView(View):
+    keys = ("err", "title", "slug", "tags", "selected_categories", "text_file")
+
+    def get(self, request):
+        ctx = {key: "" for key in self.keys}
+        ctx["categories"] = Category.objects.all()
+        return render(request, "home/article-add.html", context=ctx)
+
+    def post(self, request):
+        ctx = {key: request.POST.get(key) for key in self.keys[:-2]}
+        ctx["selected_categories"] = list(map(int, request.POST.getlist("selected_categories")))
+        text = f.read().decode("UTF-8") if (f := request.FILES.get("text_file")) else ""
+        ctx["err"] = list()
+
+        if not ctx["title"]:
+            ctx["err"].append("Title cannot be empty.")
+        if not text:
+            ctx["err"].append("Choose a file.")
+        if ctx["slug"] and re.search(r"[^a-z-\d]", ctx["slug"]):
+            ctx["err"].append("Use only lower case letters, digits and '-' for slug")
+        if tags := ctx["tags"].split():
+            if wrong_tags := [tag for tag in tags if not re.match(r"#[^\W_]+$", tag)]:
+                ctx["err"].append("Wrong tags: " + ", ".join(wrong_tags))
+                ctx["err"].append("Tags should start with # and contains alphanumeric chars only")
+        if ctx["err"]:
+            ctx["categories"] = Category.objects.all()
+            return render(request, "home/article-add.html", context=ctx)
+
+        tag_objs = [
+            _id if (_id := Tag.objects.filter(name=tag[1:]).first()) else Tag.objects.create(name=tag[1:])
+            for tag in tags
+        ]
+        content = Content.objects.create(slug=ctx["slug"], title=ctx["title"], text=text)
+        article = Article.objects.create(slug=content, author=request.user)
+        article.tags.set(tag_objs)
+        article.categories.set(ctx["selected_categories"])
+
+        return redirect(f"/{ctx['slug']}/")

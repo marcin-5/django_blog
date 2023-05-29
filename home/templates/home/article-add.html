@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Add new article{{ content.title }}{% endblock %}
+
+{% block  content %}
+    <form class="px-3 py-2" method="post" action="#" id="form-add" style="background-color: #f5f5f5" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label class="control-label"><strong>Content</strong></label>
+        <div class="row">
+            <div class="col-12">
+                <label class="m-2 control-label" for="title">Title: </label>
+                <div class="col">
+                </div>
+                <input class="mx-2 form-control-sm w-75" type="text" name="title" id="title" value="{{ title }}"
+                       maxlength="200">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <label class="m-2 control-label" for="slug">Slug: </label>
+                <div class="col">
+                </div>
+                <input class="mx-2 form-control-sm w-50" type="text" name="slug" id="slug" value="{{ slug }}"
+                       maxlength="50">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <label class="m-2 control-label" for="text_file">File: </label>
+                <div class="col">
+                </div>
+                <input class="mx-2 form-control-sm w-75" type="file" name="text_file" id="text_file"
+                       value="{{ text_file }}" accept=".txt">
+            </div>
+        </div>
+
+        <label class="control-label mt-2 pt-3"><strong>Article</strong></label>
+        <div class="row">
+            <div class="col-12">
+                <label class="m-2 control-label" for="tags">Tags: </label>
+                <div class="col">
+                </div>
+                <input class="mx-2 form-control-sm w-75" type="text" name="tags" id="tags" value="{{ tags }}"
+                       maxlength="200" placeholder="space separated tags">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <label class="m-2 control-label" for="categories">Categories: </label>
+                <div class="col">
+                </div>
+                <select class="mx-2 form-control-sm w-75" name="selected_categories" id="categories" multiple>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}"{% if category.id in selected_categories %}
+                                selected{% endif %}>{{ category }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <button class="mx-2 my-2 form-control-sm" type="submit">Publish</button>
+            </div>
+        </div>
+    </form>
+    {% if err %}
+        <div class="alert alert-warning" role="alert">
+        {% for msg in err %}
+            {{ msg }}<br>
+        {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}
