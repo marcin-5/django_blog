@@ -12,8 +12,9 @@ def create_superuser(apps, schema_editor):
 
     User.objects.create_superuser(
         email=env("DB_SU_EMAIL"),
-        username=env("DB_SU_USERNAME"),
+        name=env("DB_SU_USERNAME"),
         password=env("DB_SU_PASSWORD"),
+	can_publish=True,
     )
 
 

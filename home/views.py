@@ -51,7 +51,7 @@ class ArticleListView(ListView):
         self.ctx.update({key: value for key, value in self.request.POST.items() if key != "csrfmiddlewaretoken"})
         field = self.ctx["order_fields"][self.ctx["order_by"]]
         articles = Article.objects.filter(is_active=True).order_by("-" * (self.ctx["direction"] == "desc") + field)
-        self.ctx["authors"] = dict(articles.values_list("author_id", "author__username").distinct())
+        self.ctx["authors"] = dict(articles.values_list("author_id", "author__name").distinct())
 
         if self.ctx["date_from"]:
             articles = articles.filter(published__gte=self.ctx["date_from"])
