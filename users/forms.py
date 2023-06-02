@@ -1,11 +1,14 @@
 from django import forms
+from django.conf import settings
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
+from django.core.mail import send_mail
 
 from .models import CustomUser
 
 
 class RegistrationForm(forms.ModelForm):
     password = forms.CharField(label='Password', widget=forms.PasswordInput)
+
     class Meta:
         model = CustomUser
         fields = ('email', 'name', 'password')
@@ -56,3 +59,10 @@ class UserChangeForm(forms.ModelForm):
         # This is done here, rather than on the field, because the
         # field does not have access to the initial value
         return self.initial["password"]
+
+
+class SendRegistrationLink(forms.Form):
+    email = forms.EmailField()
+
+    def send_mail(self, to, subject, message):
+        return send_mail(subject, message, settings.EMAIL_HOST_USER, to)
