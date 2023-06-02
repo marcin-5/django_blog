@@ -33,7 +33,22 @@ class SendRegistrationLinkView(FormView):
 class RegisterUserView(FormView):
     template_name = "users/register_user.html"
     form_class = RegistrationForm
-    success_url = ""
+    success_url = "/login/"
+
+    def get_initial(self):
+        """
+        Returns the initial data to use for forms on this view.
+        """
+        user = Registration.objects.get(uuid=self.kwargs["uuid"])
+        initial = super().get_initial()
+        initial["email"] = user.email
+        return initial
+
+    def get_form_class(self):
+        form = super().get_form_class()
+        form.base_fields["email"].disabled = True
+        return form
 
     def form_valid(self, form):
+        form.save()
         return super().form_valid(form)
