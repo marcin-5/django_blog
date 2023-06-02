@@ -7,11 +7,11 @@ from .models import CustomUser
 
 
 class RegistrationForm(forms.ModelForm):
-    password = forms.CharField(label='Password', widget=forms.PasswordInput)
+    password = forms.CharField(label="Password", widget=forms.PasswordInput)
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'name', 'password')
+        fields = ("email", "name", "password")
 
     def save(self, commit=True):
         # Save the provided password in hashed format
@@ -23,12 +23,12 @@ class RegistrationForm(forms.ModelForm):
 
 
 class UserCreationForm(forms.ModelForm):
-    password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
-    password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
+    password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
+    password2 = forms.CharField(label="Password confirmation", widget=forms.PasswordInput)
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'name', 'is_staff', 'is_superuser')
+        fields = ("email", "name", "is_staff", "is_superuser")
 
     def clean_password2(self):
         # Check that the two password entries match
@@ -52,7 +52,7 @@ class UserChangeForm(forms.ModelForm):
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'name', 'password', 'is_active', 'is_superuser')
+        fields = ("email", "name", "password", "is_active", "is_superuser")
 
     def clean_password(self):
         # Regardless of what the user provides, return the initial value.
@@ -64,5 +64,5 @@ class UserChangeForm(forms.ModelForm):
 class SendRegistrationLink(forms.Form):
     email = forms.EmailField()
 
-    def send_mail(self, to, subject, message):
-        return send_mail(subject, message, settings.EMAIL_HOST_USER, to)
+    def send_mail(self, to, subject, message, fail_silently):
+        return send_mail(subject, message, settings.EMAIL_HOST_USER, to, fail_silently=fail_silently)
