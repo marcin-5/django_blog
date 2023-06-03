@@ -65,8 +65,7 @@ def login_view(request):
             username = form.cleaned_data.get("username")
             password = form.cleaned_data.get("password")
 
-            user = authenticate(email=username, password=password)
-            if user is not None:
+            if user := authenticate(email=username, password=password) is not None:
                 if user.is_active:
                     login(request, user)
                     messages.add_message(request, messages.SUCCESS, f"You are logged in. Hello {username}")
