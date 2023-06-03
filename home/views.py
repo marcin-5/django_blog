@@ -103,4 +103,4 @@ class ArticleAddView(View):
         article.tags.set(tag_objs)
         article.categories.set(ctx["selected_categories"])
 
-        return redirect(f"/{ctx['slug']}/")
+        return redirect(f"/{article.slug}/")
