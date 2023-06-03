@@ -1,7 +1,10 @@
-from django.db import IntegrityError
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.views.generic.edit import FormView
 
-from users.forms import SendRegistrationLink, RegistrationForm
+from users.forms import LoginForm, SendRegistrationLink, RegistrationForm
 from users.models import Registration, CustomUser
 
 
@@ -52,3 +55,27 @@ class RegisterUserView(FormView):
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)
+
+
+def login_view(request):
+    if request.method == "POST":
+        form = LoginForm(request, request.POST)
+
+        if form.is_valid():
+            username = form.cleaned_data.get("username")
+            password = form.cleaned_data.get("password")
+
+            user = authenticate(email=username, password=password)
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                    messages.add_message(request, messages.SUCCESS, f"You are logged in. Hello {username}")
+                    return redirect(reverse("home:home"))
+    else:
+        form = LoginForm()
+    return render(request, "users/login.html", {"form": form})
+
+
+def logout_view(request):
+    logout(request)
+    return redirect(reverse("home:home"))

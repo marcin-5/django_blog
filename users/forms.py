@@ -1,6 +1,6 @@
 from django import forms
 from django.conf import settings
-from django.contrib.auth.forms import ReadOnlyPasswordHashField
+from django.contrib.auth.forms import ReadOnlyPasswordHashField, AuthenticationForm
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 
@@ -8,8 +8,9 @@ from .models import CustomUser
 
 
 class RegistrationForm(forms.ModelForm):
-    password1 = forms.CharField(label="Password",
-                                widget=forms.PasswordInput(attrs={"placeholder": "min. 8 characters"}))
+    password1 = forms.CharField(
+        label="Password", widget=forms.PasswordInput(attrs={"placeholder": "min. 8 characters"})
+    )
     password2 = forms.CharField(label="Confirm Password", widget=forms.PasswordInput)
 
     class Meta:
@@ -75,3 +76,15 @@ class SendRegistrationLink(forms.Form):
 
     def send_mail(self, to, subject, message, fail_silently):
         return send_mail(subject, message, settings.EMAIL_HOST_USER, to, fail_silently=fail_silently)
+
+
+class LoginForm(AuthenticationForm):
+    username = forms.EmailField(
+        label="Email", required=False, widget=forms.TextInput(attrs={"name": "username", "placeholder": "Email"})
+    )
+    password = forms.CharField(widget=forms.PasswordInput)
+
+    class Meta:
+        fields = ("username", "password")
+
+    error_messages = {"invalid_login": "Wrong login data."}
