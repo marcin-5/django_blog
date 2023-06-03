@@ -9,12 +9,16 @@ from .models import CustomUser
 
 class RegistrationForm(forms.ModelForm):
     password1 = forms.CharField(label="Password",
-                                widget=forms.PasswordInput(attrs={"placeholder": "Min. 8 characters."}))
+                                widget=forms.PasswordInput(attrs={"placeholder": "min. 8 characters"}))
     password2 = forms.CharField(label="Confirm Password", widget=forms.PasswordInput)
 
     class Meta:
         model = CustomUser
         fields = ("email", "name", "password1", "password2")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["name"].widget.attrs["placeholder"] = "min. 3 characters"
 
     def clean_name(self):
         name = self.cleaned_data.get("name")
@@ -30,6 +34,12 @@ class RegistrationForm(forms.ModelForm):
         if password1 == password2 and len(password2) < 8:
             raise ValidationError("Password too short.")
         return password2
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        if CustomUser.objects.filter(email=email).first():
+            raise ValidationError("This email is registered already.")
+        return email
 
     def save(self, commit=True):
         # Save the provided password in hashed format
