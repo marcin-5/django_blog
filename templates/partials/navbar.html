@@ -19,7 +19,7 @@
             </li>
             {% if user.is_authenticated and user.can_publish %}
             <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="{% url 'home:article-list' %}">Add article</a>
+                <a class="nav-link active" aria-current="page" href="{% url 'home:article-add' %}">Add article</a>
             </li>
             {% endif %}
         </ul>
