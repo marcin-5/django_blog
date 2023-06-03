@@ -5,3 +5,9 @@
 {% block  content %}
     <div>{{ content.text|safe }}</div>
 {% endblock %}
+
+{% block forum %}
+    {% if user.is_authenticated %}
+        {% include "forum/main.html" %}
+    {% endif %}
+{% endblock %}

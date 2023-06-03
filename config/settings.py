@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     # local
     "users.apps.UsersConfig",
     "home.apps.HomeConfig",
+    "forum.apps.ForumConfig",
 ]
 
 MIDDLEWARE = [
