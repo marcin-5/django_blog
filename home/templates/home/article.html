@@ -8,6 +8,10 @@
 
 {% block forum %}
     {% if user.is_authenticated %}
-        {% include "forum/main.html" %}
+        {% if thread %}
+            {% include "forum/thread.html" %}
+        {% else %}
+            {% include "forum/main.html" %}
+        {% endif %}
     {% endif %}
 {% endblock %}

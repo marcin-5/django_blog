@@ -6,6 +6,7 @@ from django.views import View
 from django.views.generic import TemplateView, DetailView, ListView
 
 from home.models import Article, Content, Tag, Category
+from forum.models import Post, Thread
 
 
 class HomeView(TemplateView):
@@ -15,16 +16,25 @@ class HomeView(TemplateView):
 class ArticleView(DetailView):
     model = Article
     template_name = "home/article.html"
-    content = None
+    content = threads = thread = posts = back = None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["content"] = self.content
+        context["threads"] = self.threads
+        context["thread"] = self.thread
+        context["posts"] = self.posts
+        context["back"] = re.sub(r"^(.*/)[^/]+/", "\\1", self.request.path)
         return context
 
     def get_queryset(self):
         self.content = get_object_or_404(Content, slug=self.kwargs["slug"])
         self.content.text = markdown.markdown(self.content.text)
+        if thread := self.kwargs.get("thread"):
+            self.thread = Thread.objects.filter(id=thread).first()
+            self.posts = Post.objects.filter(thread_id=self.thread)
+        else:
+            self.threads = Thread.objects.filter(slug=self.kwargs["slug"])
         return Article.objects.filter(slug=self.content, is_active=True)
 
 

@@ -1,3 +1,8 @@
 <hr style="border: 1px solid indianred; width: 100%;"/>
 
-<h5>forum</h5>
+<div class="list-group">
+    {% for t in threads %}
+        <a class="text-decoration-none text-dark" href="{{ request.path }}{{ t.id }}"
+           class="list-group-item-secondary list-group-item-action">{{ t.subject }}</a>
+    {% endfor %}
+</div>

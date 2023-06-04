@@ -1,0 +1,26 @@
+<hr style="border: 1px solid indianred; width: 100%;"/>
+
+<table class="table table-sm">
+    <thead>
+    <th scope="col" class="col-2 bg-dark-subtle">
+        <a href="{{ back }}" class="list-group-item list-group-item-action list-group-item-dark">Back</a>
+    </th>
+    <th scope="col" class="col-auto  bg-light-subtle text-center">{{ thread.subject }}</th>
+    </thead>
+</table>
+<table class="table table-sm">
+    <thead>
+    <th scope="col" class="col-2">Date</th>
+    <th scope="col" class="col-2">Author</th>
+    <th scope="col" class="col-auto">Comment</th>
+    </thead>
+    <tbody>
+    {% for p in posts %}
+        <tr>
+            <td>{{ p.updated|date:"SHORT_DATETIME_FORMAT" }}</td>
+            <th scope="row">{{ p.written_by }}</th>
+            <td>{{ p.text|linebreaks }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
