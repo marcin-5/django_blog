@@ -4,7 +4,7 @@ from django.contrib.auth.forms import ReadOnlyPasswordHashField, AuthenticationF
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 
-from .models import CustomUser
+from .models import CustomUser, Registration
 
 
 class RegistrationForm(forms.ModelForm):
@@ -42,12 +42,13 @@ class RegistrationForm(forms.ModelForm):
             raise ValidationError("This email is registered already.")
         return email
 
-    def save(self, commit=True):
+    def save(self, commit=True, uuid=None):
         # Save the provided password in hashed format
         user = super().save(commit=False)
         user.set_password(self.cleaned_data["password2"])
         if commit:
             user.save()
+            Registration.objects.get(uuid=uuid).delete()
         return user
 
 

@@ -3,7 +3,7 @@
 {% block title %}Register user{% endblock %}
 
 {% block  content %}
-    {% if request.path|slice:'-5:-1' == 'done' %}
+    {% if request.path == '/user/link-sent/' %}
         <p>Registration link was sent to: {{ request.session.email }}</p>
     {% else %}
         {% if request.session.email == 'invalid' %}
