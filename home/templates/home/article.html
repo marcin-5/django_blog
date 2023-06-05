@@ -8,10 +8,16 @@
 
 {% block forum %}
     {% if user.is_authenticated %}
+        <hr style="border: 1px solid indianred; width: 100%;"/>
         {% if thread %}
             {% include "forum/thread.html" %}
         {% else %}
-            {% include "forum/main.html" %}
+            {% if threads %}
+                {% include "forum/main.html" %}
+            {% else %}
+                {% include "forum/new_thread.html" %}
+            {% endif %}
         {% endif %}
     {% endif %}
 {% endblock %}
+<h1>{{ thread }}</h1>
