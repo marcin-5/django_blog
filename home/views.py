@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.views import View
 from django.views.generic import TemplateView, DetailView, ListView, FormView
 
-from forum.forms import StartNewThreadForm
+from forum.forms import StartNewThreadForm, AddNewPostForm
 from forum.models import Post, Thread
 from home.models import Article, Content, Tag, Category
 from users.models import CustomUser
@@ -23,12 +23,12 @@ class ArticleView(DetailView, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        if not re.match(r".*/new-thread/$", self.request.path):
+            context["threads"] = self.threads
         context["content"] = self.content
-        context["threads"] = self.threads
         context["thread"] = self.thread
         context["posts"] = self.posts
         context["back"] = re.sub(r"^(.*/)[^/]+/", "\\1", self.request.path)
-        context["start_new_thread_form"] = StartNewThreadForm()
         return context
 
     def get_queryset(self):
@@ -47,6 +47,17 @@ class ArticleView(DetailView, FormView):
         thread = form.new_thread_form.save(slug=slug, user=user)
         form.new_post_form.save(thread=thread, user=user)
         return redirect(f"/{slug}/{thread.id}/")
+
+
+class ArticleThreadView(ArticleView):
+    template_name = "home/article.html"
+    form_class = AddNewPostForm
+
+    def form_valid(self, form):
+        user = CustomUser.objects.filter(name=self.request.user).first()
+        thread = Thread.objects.filter(id=self.kwargs["thread"]).first()
+        form.new_post_form.save(thread=thread, user=user)
+        return redirect(f"/{self.kwargs['slug']}/{thread.id}/")
 
 
 class ArticleListView(ListView):

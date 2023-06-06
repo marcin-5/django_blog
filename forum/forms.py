@@ -8,6 +8,11 @@ class NewThreadForm(forms.ModelForm):
         model = Thread
         fields = ("subject",)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Thread form has one visible field only
+        self.visible_fields()[0].field.widget.attrs["class"] = "form-control"
+
     def save(self, slug=None, user=None, commit=True):
         thread = super().save(commit=False)
         thread.slug = slug
@@ -25,6 +30,8 @@ class NewPostForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["text"].label = "Comment"
+        # Post form has one visible field only
+        self.visible_fields()[0].field.widget.attrs["class"] = "form-control"
 
     def save(self, thread=None, user=None, commit=True):
         post = super().save(commit=False)
@@ -82,4 +89,9 @@ class CombinedFormBase(forms.Form):
 
 class StartNewThreadForm(CombinedFormBase):
     new_post_form = new_thread_form = None
-    form_classes = [NewThreadForm, NewPostForm]
+    form_classes = (NewThreadForm, NewPostForm)
+
+
+class AddNewPostForm(CombinedFormBase):
+    new_post_form = None
+    form_classes = (NewPostForm,)
