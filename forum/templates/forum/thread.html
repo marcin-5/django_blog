@@ -1,29 +1,38 @@
 <table class="table table-sm">
     <thead>
     <th scope="col" class="col-2 bg-dark-subtle">
-        <a href="{{ back }}" class="list-group-item list-group-item-action list-group-item-dark">Back</a>
+        <a href="/{{ slug }}/" class="list-group-item list-group-item-action list-group-item-dark">Back</a>
     </th>
     <th scope="col" class="col-auto  bg-light-subtle text-center">{{ thread.subject }}</th>
     </thead>
 </table>
-<table class="table table-sm">
-    <thead>
-    <th scope="col" class="col-2">Date</th>
-    <th scope="col" class="col-2">Author</th>
-    <th scope="col" class="col-auto">Comment</th>
-    </thead>
-    <tbody>
-    {% for p in posts %}
-        <tr>
-            <td>{{ p.updated|date:"SHORT_DATETIME_FORMAT" }}</td>
-            <th scope="row">{{ p.written_by }}</th>
-            <td>{{ p.text|linebreaks }}</td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+<div class="list-group">
+    <table class="table table-sm">
+        <thead>
+        <th scope="col" class="col-2">Date</th>
+        <th scope="col" class="col-2">Author</th>
+        <th scope="col" class="col-auto">Comment</th>
+        </thead>
+        <tbody>
+        {% for p in posts %}
+            <tr>
+                <td>{{ p.updated|date:"SHORT_DATETIME_FORMAT" }}</td>
+                <th scope="row">{{ p.written_by }}</th>
+                <td><a href="/{{ slug }}/{{ thread.id }}/{{ p.id }}/"
+                       class="border-0 list-group-item list-group-item-action{% if p.written_by != user %} disabled{% endif %}">
+                    {{ p.text|linebreaks }}</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
 <form class="px-3 py-2 form-control" method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <input class="my-2 form-control-sm" type="submit" value="Post comment">
+    {% if pid %}
+        <input class="my-2 form-control-sm" type="submit" name="submit" value="Update comment"/>
+        <input class="my-2 form-control-sm" type="submit" name="submit" value="Delete comment"/>
+    {% else %}
+        <input class="my-2 form-control-sm" type="submit" name="submit" value="Post comment"/>
+    {% endif %}
 </form>

@@ -28,7 +28,7 @@ class ArticleView(DetailView, FormView):
         context["content"] = self.content
         context["thread"] = self.thread
         context["posts"] = self.posts
-        context["back"] = re.sub(r"^(.*/)[^/]+/", "\\1", self.request.path)
+        context["slug"] = self.object.slug
         return context
 
     def get_queryset(self):
@@ -53,10 +53,28 @@ class ArticleThreadView(ArticleView):
     template_name = "home/article.html"
     form_class = AddNewPostForm
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        if pid := self.request.resolver_match.kwargs.get("pid"):
+            context["pid"] = pid
+            context["form"].fields["text"].initial = Post.objects.get(thread_id=self.thread.id, id=pid).text
+
+        return context
+
     def form_valid(self, form):
         user = CustomUser.objects.filter(name=self.request.user).first()
         thread = Thread.objects.filter(id=self.kwargs["thread"]).first()
-        form.new_post_form.save(thread=thread, user=user)
+
+        if pid := self.request.resolver_match.kwargs.get("pid"):
+            if p := Post.objects.filter(id=pid).first():
+                if self.request.POST.get("submit").lower().startswith("delete"):
+                    p.delete()
+                else:
+                    p.update(text=self.request.POST["text"])
+        else:
+            form.new_post_form.save(thread=thread, user=user)
+
         return redirect(f"/{self.kwargs['slug']}/{thread.id}/")
 
 

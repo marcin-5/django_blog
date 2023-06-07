@@ -11,4 +11,5 @@ urlpatterns = [
     path("<slug:slug>/", views.ArticleView.as_view()),
     path("<slug:slug>/new-thread/", views.ArticleView.as_view()),
     path("<slug:slug>/<str:thread>/", views.ArticleThreadView.as_view()),
+    path("<slug:slug>/<str:thread>/<int:pid>/", views.ArticleThreadView.as_view()),
 ]
