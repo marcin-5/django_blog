@@ -37,6 +37,7 @@ class Post(models.Model):
     written_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    hidden = models.BooleanField(default=False)
     text = models.TextField()
 
     class Meta:

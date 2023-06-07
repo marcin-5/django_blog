@@ -58,7 +58,9 @@ class ArticleThreadView(ArticleView):
 
         if pid := self.request.resolver_match.kwargs.get("pid"):
             context["pid"] = pid
-            context["form"].fields["text"].initial = Post.objects.get(thread_id=self.thread.id, id=pid).text
+            p = Post.objects.get(thread_id=self.thread.id, id=pid)
+            context["form"].fields["text"].initial = p.text
+            context["action"] = "Show" if p.hidden else "Hide"
 
         return context
 
@@ -68,10 +70,15 @@ class ArticleThreadView(ArticleView):
 
         if pid := self.request.resolver_match.kwargs.get("pid"):
             if p := Post.objects.filter(id=pid).first():
-                if self.request.POST.get("submit").lower().startswith("delete"):
-                    p.delete()
-                else:
-                    p.update(text=self.request.POST["text"])
+                match self.request.POST.get("submit").split()[0].lower():
+                    case "delete":
+                        p.delete()
+                    case "hide" | "show":
+                        p.hidden = not p.hidden
+                        p.save()
+                    case _:
+                        p.text = self.request.POST["text"]
+                        p.save()
         else:
             form.new_post_form.save(thread=thread, user=user)
 

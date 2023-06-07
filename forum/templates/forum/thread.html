@@ -1,3 +1,4 @@
+{% load actions %}
 <table class="table table-sm">
     <thead>
     <th scope="col" class="col-2 bg-dark-subtle">
@@ -15,12 +16,26 @@
         </thead>
         <tbody>
         {% for p in posts %}
+            {% if p.written_by == user %}
+                {% define "" as disabled %}
+            {% else %}
+                {% define " disabled" as disabled %}
+            {% endif %}
+            {% if p.hidden %}
+                {% define "bg-dark-subtle " as bg %}
+            {% else %}
+                {% define "" as bg %}
+            {% endif %}
             <tr>
                 <td>{{ p.updated|date:"SHORT_DATETIME_FORMAT" }}</td>
                 <th scope="row">{{ p.written_by }}</th>
-                <td><a href="/{{ slug }}/{{ thread.id }}/{{ p.id }}/"
-                       class="border-0 list-group-item list-group-item-action{% if p.written_by != user %} disabled{% endif %}">
-                    {{ p.text|linebreaks }}</a></td>
+                {% if bg and disabled %}
+                    <td class="{{ bg }}">This comment is hidden.</td>
+                {% else %}
+                    <td class="{{ bg }}"><a href="/{{ slug }}/{{ thread.id }}/{{ p.id }}/"
+                                            class="{{ bg }}border-0 list-group-item list-group-item-action{{ disabled }}">
+                        {{ p.text|linebreaks }}</a></td>
+                {% endif %}
             </tr>
         {% endfor %}
         </tbody>
@@ -30,6 +45,7 @@
     {% csrf_token %}
     {{ form.as_p }}
     {% if pid %}
+        <input class="my-2 form-control-sm" type="submit" name="submit" value="{{ action }} comment"/>
         <input class="my-2 form-control-sm" type="submit" name="submit" value="Update comment"/>
         <input class="my-2 form-control-sm" type="submit" name="submit" value="Delete comment"/>
     {% else %}
