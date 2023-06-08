@@ -10,11 +10,11 @@ def test_registration_page(client, db):
     assert '<input class="my-2 form-control-sm" type="submit" value="Register">' in response.content.decode("UTF-8")
 
 
-def test_login_page(client, user, db, django_user_model):
+def test_login_page(client, create_user, db, django_user_model):
     url = reverse("users:login")
-    data = {"username": user.email,
-            "password": user.password,
-            "name": user.name}
+    data = {"username": create_user.email,
+            "password": create_user.password,
+            "name": create_user.name}
     response = client.get(url)
     redirect = client.post(url, data=data)
     user = django_user_model.objects.get(email=data["username"])

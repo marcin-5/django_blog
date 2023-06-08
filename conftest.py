@@ -16,7 +16,7 @@ def django_db_setup():
 
 
 @pytest.fixture
-def user(db, django_db_setup, django_user_model):
+def create_user(db, django_db_setup, django_user_model):
     """User instance"""
     return django_user_model.objects.create_user(email="test_user@mail.ru", name="Test User", password="Pass1234")
 
