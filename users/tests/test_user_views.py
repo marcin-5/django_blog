@@ -44,16 +44,19 @@ def test_register_user(client, db, registration, django_user_model, create_user)
     redirect = client.post(url, data={**data, **{"name": "X"}})
     assert redirect.status_code == 200
     assert len(django_user_model.objects.filter(email=data["email"])) == 0
+    assert "Name too short." in redirect.content.decode("UTF-8")
 
     # password missmatch
     redirect = client.post(url, data={**data, **{"password1": "12341234"}})
     assert redirect.status_code == 200
     assert len(django_user_model.objects.filter(email=data["email"])) == 0
+    assert "Password missmatch." in redirect.content.decode("UTF-8")
 
     # password too short
     redirect = client.post(url, data={**data, **{"password1": "1234123", "password2": "1234123"}})
     assert redirect.status_code == 200
     assert len(django_user_model.objects.filter(email=data["email"])) == 0
+    assert "Password too short." in redirect.content.decode("UTF-8")
 
     redirect = client.post(url, data=data)
     user = django_user_model.objects.get(email=data["email"])
