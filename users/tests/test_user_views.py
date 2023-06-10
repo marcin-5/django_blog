@@ -36,8 +36,9 @@ def test_login_page(client, create_user, db, django_user_model):
 
 
 def test_register_user(client, db, registration, django_user_model, create_user):
-    url = reverse("users:register-uuid", kwargs={"uuid": registration.uuid})
-    data = {"email": registration.email, "name": "Test User", "password1": "pass1234", "password2": "pass1234"}
+    r = registration()
+    url = reverse("users:register-uuid", kwargs={"uuid": r.uuid})
+    data = {"email": r.email, "name": "Test User", "password1": "pass1234", "password2": "pass1234"}
 
     # name too short
     redirect = client.post(url, data={**data, **{"name": "X"}})
@@ -54,12 +55,6 @@ def test_register_user(client, db, registration, django_user_model, create_user)
     assert redirect.status_code == 200
     assert len(django_user_model.objects.filter(email=data["email"])) == 0
 
-    # email already registered #FIXME
-    test_user = create_user()
-    redirect = client.post(url, data={**data, **{"email": test_user.email}})
-    assert redirect.status_code == 200
-    test_user.delete()
-
     redirect = client.post(url, data=data)
     user = django_user_model.objects.get(email=data["email"])
 
@@ -70,21 +65,11 @@ def test_register_user(client, db, registration, django_user_model, create_user)
     assert response.status_code == 200
     assert "<h5>Login Form</h5>" in response.content.decode("UTF-8")
 
-    assert str(registration) == f"{registration.uuid} - {registration.email}"
+    assert str(r) == f"{r.uuid} - {r.email}"
 
-
-# @pytest.mark.django_db
-# def test_form_valid_registration(create_user):
-#     user = create_user()
-#     request = factory.post(reverse("users:registration"), data={"email": user.email})
-#     request = factory.post(reverse("users:registration"), data={"email": "a@a.pl"})
-
-
-# @pytest.mark.django_db
-# def test_form_valid_login(create_user):
-#     user = create_user()
-#     request = factory.post(reverse("users:login"), data={"username": user.email, "password": user.password})
-#     request.user = user
-#     response = login_view(request)
-#
-#     assert response.status_code == 200
+    # email already registered
+    r = registration()
+    url = reverse("users:register-uuid", kwargs={"uuid": r.uuid})
+    redirect = client.post(url, data={**data, **{"email": r.email, "name": "abc def"}})
+    assert redirect.status_code == 200
+    assert "This email is registered already." in redirect.content.decode("UTF-8")

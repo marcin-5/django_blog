@@ -39,8 +39,13 @@ def create_user(db, django_db_setup, django_user_model, test_password):
 
 @pytest.fixture
 def registration(db, django_db_setup):
-    """User instance"""
-    return Registration.objects.create(email="test_user@test.ru")
+    """Registration instance"""
+    def make_registration(**kwargs):
+        if "email" not in kwargs:
+            kwargs["email"] = "test_user@test.ru"
+        return Registration.objects.create(email=kwargs["email"])
+
+    return make_registration
 
 
 @pytest.fixture
