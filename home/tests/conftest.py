@@ -9,6 +9,6 @@ sys.path.append(os.path.dirname(__file__))
 
 
 @pytest.fixture
-def client():
+def api_client():
     client = APIClient()
     return client

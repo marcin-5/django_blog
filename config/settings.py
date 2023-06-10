@@ -99,7 +99,7 @@ DATABASES = {
         "ENFORCE_SCHEMA": False,
         "CLIENT": {
             "host": env("MONGO_HOST"),
-            "port": env("MONGO_PORT"),
+            "port": int(env("MONGO_PORT")),
             "username": env("MONGO_INITDB_ROOT_USERNAME"),
             "password": env("MONGO_INITDB_ROOT_PASSWORD"),
             "authSource": env("MONGO_AUTH_SOURCE_DATABASE"),
