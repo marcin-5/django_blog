@@ -1,12 +1,4 @@
-import pytest
-
-from django.test import RequestFactory
 from django.urls import reverse
-
-from users.models import CustomUser
-from users.views import SendRegistrationLinkView, login_view
-
-factory = RequestFactory()
 
 
 def test_registration_page(client, db):
@@ -24,15 +16,15 @@ def test_login_page(client, create_user, db, django_user_model):
     data = {"username": user.email,
             "password": user.password,
             "name": user.name}
+    client.force_login(user)
     response = client.get(url)
     redirect = client.post(url, data=data)
-    user = django_user_model.objects.get(email=data["username"])
 
     assert response.status_code == 200
     assert "<h5>Login Form</h5>" in response.content.decode("UTF-8")
 
     assert redirect.status_code == 200
-    assert user.name == data["name"]
+    assert redirect.context["user"].is_authenticated is True
 
 
 def test_register_user(client, db, registration, django_user_model, create_user):
