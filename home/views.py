@@ -56,7 +56,7 @@ class ArticleThreadView(ArticleView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        if pid := self.request.resolver_match.kwargs.get("pid"):
+        if pid := self.kwargs.get("pid"):
             context["pid"] = pid
             p = Post.objects.get(thread_id=self.thread.id, id=pid)
             context["form"].fields["text"].initial = p.text
@@ -68,7 +68,7 @@ class ArticleThreadView(ArticleView):
         user = CustomUser.objects.filter(name=self.request.user).first()
         thread = Thread.objects.filter(id=self.kwargs["thread"]).first()
 
-        if pid := self.request.resolver_match.kwargs.get("pid"):
+        if pid := self.kwargs.get("pid"):
             if p := Post.objects.filter(id=pid).first():
                 match self.request.POST.get("submit").split()[0].lower():
                     case "delete":
