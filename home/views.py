@@ -119,9 +119,6 @@ class ArticleListView(ListView):
 
         return articles.values_list("slug", "slug__title", "author_id")
 
-    def post(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
 
 class ArticleAddView(View):
     keys = ("err", "title", "slug", "tags", "selected_categories", "text_file")

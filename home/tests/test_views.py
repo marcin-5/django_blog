@@ -69,7 +69,7 @@ def test_article_list(auto_login_user, add_article):
 
 
 @pytest.mark.django_db
-def test_article_thread(auto_login_user, add_article):
+def test_article_thread_post(auto_login_user, add_article):
     client, user = auto_login_user()
     article = add_article(client=client, user=user)
     url = f"/{article.slug}/"
@@ -78,7 +78,41 @@ def test_article_thread(auto_login_user, add_article):
     assert response.status_code == 200
     assert "Add thread" in response.content.decode("UTF-8")
 
-    response = client.post(url, {"subject": "101", "text": "comment"})
+    response = client.post(url, {"subject": "101", "text": "[this is comment]"})
     assert response.status_code == 302
-    response = client.get(response.headers["Location"])
+
+    url = response.headers["Location"]
+    response = client.get(url)
     assert response.status_code == 200
+
+    url += f'{response.context_data["posts"][0].id}/'
+    response = client.get(url)
+    assert response.status_code == 200
+    assert "[this is comment]</textarea>" in response.content.decode("UTF-8")
+
+    response = client.post(url, {"text": "[modified comment]", "submit": "Update"})
+    assert response.status_code == 302
+
+    response = client.get(url)
+    assert response.status_code == 200
+    assert "[modified comment]</textarea>" in response.content.decode("UTF-8")
+
+    response = client.post(url, {"text": "[modified comment]", "submit": "Hide"})
+    assert response.status_code == 302
+
+    response = client.get(url)
+    assert response.status_code == 200
+    assert 'name="submit" value="Show comment"' in response.content.decode("UTF-8")
+    assert url in response.content.decode("UTF-8")
+
+    response = client.post(url, {"text": "[modified comment]", "submit": "Delete"})
+    assert response.status_code == 302
+
+    response_get = client.get(response.headers["Location"])
+    response_post = client.post(response.headers["Location"], {"text": "[New comment]", "submit": "Post comment"})
+    assert response_get.status_code == 200
+    assert url not in response_get.content.decode("UTF-8")
+    assert response_post.status_code == 302
+
+    response = client.get(response_post.headers["Location"])
+    assert "<p>[New comment]</p>" in response.content.decode("UTF-8")
