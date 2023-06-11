@@ -1,6 +1,8 @@
 import pytest
 
 from django.conf import settings
+from rest_framework.test import APIClient
+
 
 from home.models import Article, Content, Category, Tag
 from users.models import Registration
@@ -14,6 +16,12 @@ def django_db_setup():
         "NAME": "external_db",
         "ATOMIC_REQUESTS": True,
     }
+
+
+@pytest.fixture
+def api_client():
+    client = APIClient()
+    return client
 
 
 @pytest.fixture
