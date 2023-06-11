@@ -68,3 +68,45 @@ def test_register_user(client, db, registration, django_user_model, create_user)
     redirect = client.post(url, data={**data, **{"email": r.email, "name": "abc def"}})
     assert redirect.status_code == 200
     assert "This email is registered already." in redirect.content.decode("UTF-8")
+
+
+def test_send_registration_link(client, create_user):
+    user = create_user()
+    url = reverse("users:registration")
+
+    response = client.get(url)
+    assert response.status_code == 200
+
+    # try to register if user is registered
+    response = client.post(url, {"email": user.email, "submit": "Register"})
+    assert response.status_code == 302
+    response = client.get(response.headers["Location"])
+    assert response.status_code == 200
+
+    # try to register new user
+    response = client.post(url, {"email": "new@test.xy", "submit": "Register"})
+    assert response.status_code == 302
+    response = client.get(response.headers["Location"])
+    assert response.status_code == 200
+
+    # try to register with wrong email
+    response = client.post(url, {"email": "newtest.xy", "submit": "Register"})
+    assert response.status_code == 200
+    assert "Enter a valid email address." in response.content.decode("UTF-8")
+
+
+def test_login_and_logout_user(auto_login_user, test_password):
+    client, user = auto_login_user()
+    url = reverse("users:logout")
+
+    response = client.get(url)
+    assert response.status_code == 302
+    assert response.headers["Location"] == reverse("home:home")
+
+    url = reverse("users:login")
+    response = client.post(url, {"username": user.email, "password": test_password})
+    assert response.status_code == 302
+    assert response.headers["Location"] == reverse("home:home")
+    response = client.get(response.headers["Location"])
+    assert response.status_code == 200
+    assert response.context["user"].is_authenticated is True

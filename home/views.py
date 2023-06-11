@@ -119,9 +119,6 @@ class ArticleListView(ListView):
 
         return articles.values_list("slug", "slug__title", "author_id")
 
-    def post(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
 
 class ArticleAddView(View):
     keys = ("err", "title", "slug", "tags", "selected_categories", "text_file")
@@ -143,7 +140,7 @@ class ArticleAddView(View):
             ctx["err"].append("Choose a file.")
         if ctx["slug"] and re.search(r"[^a-z-\d]", ctx["slug"]):
             ctx["err"].append("Use only lower case letters, digits and '-' for slug")
-        if tags := ctx["tags"].split():
+        if tags := (ctx["tags"] or "").split():
             if wrong_tags := [tag for tag in tags if not re.match(r"#[^\W_]+$", tag)]:
                 ctx["err"].append("Wrong tags: " + ", ".join(wrong_tags))
                 ctx["err"].append("Tags should start with # and contains alphanumeric chars only")
