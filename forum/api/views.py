@@ -31,3 +31,13 @@ class PostView(generics.RetrieveUpdateDestroyAPIView):
         return Post.objects.filter(
             thread=self.kwargs.get("thread"), id=self.kwargs.get("pk"), written_by=self.request.user.id
         )
+
+
+class AddThreadView(generics.CreateAPIView):
+    serializer_class = ThreadsSerializer
+    permission_classes = [IsAuthenticated]
+
+
+class AddPostView(generics.CreateAPIView):
+    serializer_class = PostsSerializer
+    permission_classes = [IsAuthenticated]

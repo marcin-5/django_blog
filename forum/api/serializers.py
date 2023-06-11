@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from forum.models import Thread, Post
+from home.models import Article
 
 
 class ThreadsSerializer(serializers.Serializer):
@@ -13,6 +14,11 @@ class ThreadsSerializer(serializers.Serializer):
     class Meta:
         model = Thread
 
+    def create(self, validated_data):
+        validated_data["slug"] = Article.objects.get(slug=self.context["view"].kwargs["slug"])
+        validated_data["started_by"] = self.context["view"].request.user
+        return Thread.objects.create(**validated_data)
+
 
 class PostsSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
@@ -24,3 +30,8 @@ class PostsSerializer(serializers.Serializer):
 
     class Meta:
         model = Post
+
+    def create(self, validated_data):
+        validated_data["thread"] = Thread.objects.get(pk=self.context["view"].kwargs["thread"])
+        validated_data["written_by"] = self.context["view"].request.user
+        return Post.objects.create(**validated_data)
