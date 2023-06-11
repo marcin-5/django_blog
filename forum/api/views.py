@@ -21,3 +21,13 @@ class PostListView(generics.ListAPIView):
         return Post.objects.filter(thread=self.kwargs.get("thread"), hidden=True).filter(
             written_by=self.request.user.id
         ) | Post.objects.filter(thread=self.kwargs.get("thread"), hidden=False)
+
+
+class PostView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = PostsSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Post.objects.filter(
+            thread=self.kwargs.get("thread"), id=self.kwargs.get("pk"), written_by=self.request.user.id
+        )
