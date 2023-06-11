@@ -12,14 +12,14 @@ def test_create_user(create_user, django_user_model):
         create_user(name="")
 
     user = create_user()
-    users = django_user_model.objects.filter(email="test_user@mail.ru")
+    users = django_user_model.objects.filter(email="test_user@test.xy")
 
     assert len(users) == 1
     assert users.first().name == user.name
     user.delete()
 
     user = create_user(superuser=True)
-    users = django_user_model.objects.filter(email="test_user@mail.ru")
+    users = django_user_model.objects.filter(email="test_user@test.xy")
 
     assert len(users) == 1
     assert str(users.first()) == user.name

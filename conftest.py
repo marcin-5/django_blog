@@ -30,7 +30,7 @@ def create_user(db, django_db_setup, django_user_model, test_password):
         if "name" not in kwargs:
             kwargs["name"] = "Test User"
         if "email" not in kwargs:
-            kwargs["email"] = "test_user@mail.ru"
+            kwargs["email"] = "test_user@test.xy"
         if "superuser" in kwargs:
             del kwargs["superuser"]
             return django_user_model.objects.create_superuser(**kwargs)
